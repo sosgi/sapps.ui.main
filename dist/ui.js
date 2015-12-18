@@ -50,25 +50,27 @@ System.register(['sjs-dom', './res/main.html!text'], function (_export) {
                     this.$div = div.firstChild;
 
                     document.body.appendChild(this.$div);
-                    //document.querySelector('#x-sapps-usernav-name').innerHTML = user.name;
                     this.$showMore = document.querySelector('#sapps-nav-apps-more');
                     this.$appList = document.querySelector('#sapps-apps-list');
                     this.$container = document.querySelector('#sapps-container');
                     this.$currentAppLabel = document.querySelector('#sapps-nav-apps-current');
 
-                    dom.events(this.$currentAppLabel).add('click', this.onReloadApp, this);
-                    dom.events(this.$showMore).add('click', this.onShowAppList, this);
-                    dom.events(this.$appList).add('click', this.onSelectApp, this);
+                    dom.on(this.$currentAppLabel, 'click', this.onReloadApp, this);
+                    dom.on(this.$showMore, 'click', this.onShowAppList, this);
+                    dom.on(this.$appList, 'click', this.onSelectApp, this);
                     div = null;
+                },
+                updateUser: function updateUser(user) {
+                    document.querySelector('#x-sapps-usernav-name').innerHTML = user.name;
                 },
                 remove: function remove() {
                     if (this.$div) {
                         this.$div.parentNode.removeChild(this.$div);
                     }
 
-                    dom.events(this.$currentAppLabel).remove('click', this.onReloadApp, this);
-                    dom.events(this.$showMore).remove('click', this.onShowAppList, this);
-                    dom.events(this.$appList).remove('click', this.onSelectApp, this);
+                    dom.off(this.$currentAppLabel, 'click', this.onReloadApp, this);
+                    dom.off(this.$showMore, 'click', this.onShowAppList, this);
+                    dom.off(this.$appList, 'click', this.onSelectApp, this);
 
                     this.$showMore = null;
                     this.$appList = null;
@@ -104,6 +106,7 @@ System.register(['sjs-dom', './res/main.html!text'], function (_export) {
                     }
                 },
                 onSelectApp: function onSelectApp(e) {
+                    e.stop();
                     this.$div.classList.remove('show-list');
                     var id = parseInt(e.target.dataset.sid, 10);
                     this.on.select.fire([id]);

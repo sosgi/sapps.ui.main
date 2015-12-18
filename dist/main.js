@@ -7,6 +7,8 @@ System.register(['sosgi.cdi', './ui'], function (_export) {
 
     function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
+    function _defineDecoratedPropertyDescriptor(target, key, descriptors) { var _descriptor = descriptors[key]; if (!_descriptor) return; var descriptor = {}; for (var _key in _descriptor) descriptor[_key] = _descriptor[_key]; descriptor.value = descriptor.initializer ? descriptor.initializer.call(target) : undefined; Object.defineProperty(target, key, descriptor); }
+
     return {
         setters: [function (_sosgiCdi) {
             di = _sosgiCdi['default'];
@@ -15,8 +17,20 @@ System.register(['sosgi.cdi', './ui'], function (_export) {
         }],
         execute: function () {
             MainUI = (function () {
+                var _instanceInitializers = {};
+                var _instanceInitializers = {};
+
+                _createDecoratedClass(MainUI, [{
+                    key: '$users',
+                    decorators: [di.assign('IUserService')],
+                    initializer: null,
+                    enumerable: true
+                }], null, _instanceInitializers);
+
                 function MainUI() {
                     _classCallCheck(this, _MainUI);
+
+                    _defineDecoratedPropertyDescriptor(this, '$users', _instanceInitializers);
 
                     this._apps = {};
                 }
@@ -25,23 +39,18 @@ System.register(['sosgi.cdi', './ui'], function (_export) {
                     key: 'activate',
                     decorators: [di.activate.bind(di)],
                     value: function activate(ctx) {
+                        var _this = this;
+
                         console.log('MainUI::activate()');
                         this.ui = new UI();
 
                         this.ui.on.select.add(this.onSelectApp, this);
                         this.ui.on.reload.add(this.onReloadApp, this);
 
-                        //this.$users.getUser().done(function(user){
                         this.ui.create();
-                        //}, this);
-                        //var self = this;
-
-                        //ctx.services.register($api.ui.Route, function(){
-                        //            self.$users.logout();
-                        //            self.$browser.url('/login');
-                        //        },{
-                        //            match:'/logout'
-                        //        });
+                        this.$users.getUser().then(function (user) {
+                            _this.ui.updateUser(user);
+                        });
                     }
                 }, {
                     key: 'deactivate',
@@ -53,7 +62,7 @@ System.register(['sosgi.cdi', './ui'], function (_export) {
                     }
                 }, {
                     key: 'addApp',
-                    decorators: [di.bind('IApp', '0..n')],
+                    decorators: [di.bind('IApp', '1..n')],
                     value: function addApp(ref, app) {
                         console.debug('MainUI::addApp(' + ref.id + ',' + app.name + ')');
                         this._apps[ref.id] = {
@@ -68,7 +77,6 @@ System.register(['sosgi.cdi', './ui'], function (_export) {
                     key: 'removeApp',
                     decorators: [di.unbind('IApp')],
                     value: function removeApp(ref, app) {
-                        debugger;
                         var props = ref.properties;
                         console.debug('MainUI::removeApp(' + ref.id + ',' + app.name + ')');
                         if (app === this._apps[ref.id].app) {
@@ -113,7 +121,7 @@ System.register(['sosgi.cdi', './ui'], function (_export) {
                     value: function toString() {
                         return 'sapps.ui.main/main:MainUi';
                     }
-                }]);
+                }], null, _instanceInitializers);
 
                 var _MainUI = MainUI;
                 MainUI = di('MainUI')(MainUI) || MainUI;

@@ -4,7 +4,8 @@ import UI from './ui';
 @di('MainUI')
 export class MainUI{
 
-    $browser;
+    @di.assign('IUserService')
+    $users;
 
     constructor(){
         this._apps = {};
@@ -18,17 +19,10 @@ export class MainUI{
         this.ui.on.select.add(this.onSelectApp, this);
         this.ui.on.reload.add(this.onReloadApp, this);
 
-        //this.$users.getUser().done(function(user){
-            this.ui.create();
-        //}, this);
-        //var self = this;
-
-        //ctx.services.register($api.ui.Route, function(){
-//            self.$users.logout();
-//            self.$browser.url('/login');
-//        },{
-//            match:'/logout'
-//        });
+        this.ui.create();
+        this.$users.getUser().then(user => {
+            this.ui.updateUser(user);
+        });
     }
     @di.deactivate
     deactivate(ctx) {
@@ -36,7 +30,7 @@ export class MainUI{
         this.ui.remove();
         this.ui = null;
     }
-    @di.bind('IApp', '0..n')
+    @di.bind('IApp', '1..n')
     addApp(ref, app){
         console.debug('MainUI::addApp('+ref.id +','+app.name+')');
         this._apps[ref.id] = {
@@ -49,7 +43,6 @@ export class MainUI{
     }
     @di.unbind('IApp')
     removeApp(ref, app){
-        debugger;
         var props = ref.properties
         console.debug('MainUI::removeApp('+ref.id +','+app.name+')');
         if(app === this._apps[ref.id].app){
